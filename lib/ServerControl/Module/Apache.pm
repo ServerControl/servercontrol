@@ -44,10 +44,6 @@ sub help {
    print "apache-help\n";
 }
 
-sub create {
-   my ($class) = @_;
-}
-
 sub start {
    my ($class) = @_;
 

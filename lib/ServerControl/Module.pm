@@ -15,6 +15,9 @@ use Cwd qw(getcwd);
 use Data::Dumper;
 
 use ServerControl::Commons::FS;
+use ServerControl::Commons::Object;
+
+use base qw(ServerControl::Commons::Object);
 
 sub Parameter {
    my $class  = shift;
@@ -22,13 +25,15 @@ sub Parameter {
 
    if($class ne 'ServerControl::Module::Base') {
       $params->{'create'} = { isa => 'bool',   call => sub {
-                                                               ServerControl->d_print("Creating directroy structure\n");
                                                                $class->create_directories;
-
-                                                               ServerControl->d_print("Creating files\n");
                                                                $class->create_files;
 
-                                                               $class->create; 
+                                                               if($class->has('create')) {
+                                                                  $class->create; 
+                                                               }
+
+                                                               $class->create_control_scripts;
+                                                               $class->create_instance_conf;
                                                            } };
 
       $params->{'start'} = { isa => 'bool', call => sub {
@@ -164,6 +169,7 @@ sub get_files {
 sub create_directories {
    my ($class) = @_;
 
+   ServerControl->d_print("Creating directroy structure\n");
    my $path = $class->get_path;
    
    my $dirs = $class->get_directories;
@@ -177,6 +183,7 @@ sub create_directories {
 sub create_files {
    my ($class) = @_;
 
+   ServerControl->d_print("Creating files\n");
    my $path = $class->get_path;
 
    my $files = $class->get_files;
@@ -198,6 +205,33 @@ sub create_files {
          copy($c->{'copy'}, $path . '/' . $file);
       }
    }
+}
+
+sub create_control_scripts {
+   my ($class) = @_;
+
+   ServerControl->d_print("Creating control scripts\n");
+
+   if($class->has('start')) {
+   }
+
+   if($class->has('stop')) {
+   }
+}
+
+sub create_instance_conf {
+   my ($class) = @_;
+
+   ServerControl->d_print("Creating instance.conf\n");
+
+   # fuer die rueckwaertskompatibilitaet
+   my @instance_conf;
+   my $args = ServerControl::Args->get;
+   for my $key (keys %{$args}) {
+      my $val = $args->{$key};
+      push (@instance_conf, "$key=$val");
+   }
+   put_file($class->get_path . '/conf/instance.conf', join("\n", @instance_conf));
 }
 
 1;
