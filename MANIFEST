@@ -2,6 +2,7 @@ bin/servercontrol
 lib/ServerControl.pm
 lib/ServerControl/Args.pm
 lib/ServerControl/Commons/FS.pm
+lib/ServerControl/Commons/Object.pm
 lib/ServerControl/Commons/Process.pm
 lib/ServerControl/Exception.pm
 lib/ServerControl/Exception/Schema/ModuleNotFound.pm
