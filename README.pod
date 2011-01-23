@@ -1,0 +1,15 @@
+=pod
+
+ServerControl is an utility to manage (multiple) instances of different *nix daemons like Apache, Postfix, Dovecot, MySQL, and much more.
+
+This is the repository of the next ServerControl version.
+
+=head2 Dependencies
+
+=over 4
+
+=item *
+
+Perl 5.10
+
+=back
