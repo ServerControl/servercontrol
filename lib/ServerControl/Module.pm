@@ -58,6 +58,46 @@ sub Parameter {
 
                                                             chdir($wd);
                                                         } };
+      $params->{'restart'} = { isa => 'bool', call => sub {
+                                                            ServerControl->d_print("Restarting instance\n");
+
+                                                            my $wd = getcwd;
+                                                            chdir(ServerControl::Args->get->{'path'});
+
+                                                            $class->restart;
+
+                                                            chdir($wd);
+                                                        } };
+
+      $params->{'reload'} = { isa => 'bool', call => sub {
+                                                            ServerControl->d_print("Reloading instance\n");
+
+                                                            my $wd = getcwd;
+                                                            chdir(ServerControl::Args->get->{'path'});
+
+                                                            $class->reload;
+
+                                                            chdir($wd);
+                                                        } };
+
+      $params->{'status'} = { isa => 'bool', call => sub {
+                                                            ServerControl->d_print("Status instance\n");
+
+                                                            my $wd = getcwd;
+                                                            chdir(ServerControl::Args->get->{'path'});
+
+                                                            my $ret = $class->status;
+                                                            if($ret) {
+                                                               ServerControl->d_print("Running\n");
+                                                               exit 0;
+                                                            } else {
+                                                               ServerControl->d_print("Stopped\n");
+                                                               exit 1;
+                                                            }
+
+                                                            chdir($wd);
+                                                        } };
+
    }
 
    no strict 'refs';
@@ -223,6 +263,18 @@ sub create_control_scripts {
 
    if($class->has('stop')) {
       symlink($bin, "$path/stop");
+   }
+
+   if($class->has('restart')) {
+      symlink($bin, "$path/restart");
+   }
+
+   if($class->has('reload')) {
+      symlink($bin, "$path/reload");
+   }
+
+   if($class->has('status')) {
+      symlink($bin, "$path/status");
    }
 }
 

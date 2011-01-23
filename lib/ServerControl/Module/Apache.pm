@@ -58,4 +58,27 @@ sub stop {
    spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k stop");
 }
 
+sub restart {
+   my ($class) = @_;
+
+   my ($name, $path) = ($class->get_name, $class->get_path);
+   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k restart");
+}
+
+sub reload {
+   my ($class) = @_;
+
+   my ($name, $path) = ($class->get_name, $class->get_path);
+   spawn("$path/bin/httpd-$name -d $path -f $path/conf/httpd.conf -k graceful");
+}
+
+sub status {
+   my ($class) = @_;
+
+   my ($name, $path) = ($class->get_name, $class->get_path);
+   if(-f $path . '/run/httpd.pid') { return 1; }
+}
+
+
+
 1;
