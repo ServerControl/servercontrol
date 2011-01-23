@@ -12,6 +12,8 @@ use warnings;
 use Switch;
 use File::Copy qw(copy);
 use Cwd qw(getcwd);
+use File::Basename qw(dirname);
+
 use Data::Dumper;
 
 use ServerControl::Commons::FS;
@@ -212,10 +214,15 @@ sub create_control_scripts {
 
    ServerControl->d_print("Creating control scripts\n");
 
+   my $bin  = $0;
+   my $path = $class->get_path;
+
    if($class->has('start')) {
+      symlink($bin, "$path/start");
    }
 
    if($class->has('stop')) {
+      symlink($bin, "$path/stop");
    }
 }
 
@@ -229,6 +236,8 @@ sub create_instance_conf {
    my $args = ServerControl::Args->get;
    for my $key (keys %{$args}) {
       my $val = $args->{$key};
+      next if ($key eq 'create');
+
       push (@instance_conf, "$key=$val");
    }
    put_file($class->get_path . '/conf/instance.conf', join("\n", @instance_conf));

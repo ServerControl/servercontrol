@@ -11,16 +11,27 @@ use warnings;
 
 use ServerControl::Args;
 use ServerControl::Template;
+use ServerControl::Commons::FS;
 
 use Data::Dumper;
 use Getopt::Long qw(:config pass_through);
+use File::Basename qw(dirname);
+use FindBin;
 
 our $VERSION = '1.0.0';
 our $MODULES = [];
 
 sub run {
+   my ($class) = @_;
    my %opts;
    my @opts;
+
+   my $exec_path = $FindBin::Bin;
+   if( -f "$exec_path/conf/instance.conf") {
+      # wenn in einer instanz, dann ServerControl::ctrl ausfuehren
+      # um die instanz zu verwalten.
+      $class->ctrl($exec_path);
+   }
 
    my @ORIG_ARGV = @ARGV;
 
@@ -36,6 +47,33 @@ sub run {
    @ARGV = @ORIG_ARGV; # restore @ARGV for module parameter
    GetOptions($mod_class->get_options);
 
+}
+
+sub ctrl {
+   my ($class, $dir) = @_;
+   my $conf = $class->get_instance_conf("$dir/conf/instance.conf");
+
+   for my $key (keys %{$conf}) {
+      push(@ARGV, "--$key" . ($conf->{$key} ne "1"?"=".$conf->{$key}:""));
+   }
+
+   my $call = [ split(/\//, $0) ]->[-1];
+   push(@ARGV, "--$call");
+
+   ServerControl::Args->import;
+}
+
+sub get_instance_conf {
+   my ($class, $file) = @_;
+   
+   my $conf = {};
+   my @content = cat_file($file);
+   for my $line (@content) {
+      my($key, $val) = ($line =~ m/^(.*?)=(.*)$/);
+      $conf->{$key} = $val;
+   }
+
+   $conf;
 }
 
 sub d_print {
