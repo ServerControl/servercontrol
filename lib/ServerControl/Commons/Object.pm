@@ -12,11 +12,9 @@ use warnings;
 sub has {
    my ($class, $what) = @_;
 
-   no strict 'refs';
-   my $class_syms = \%{(ref($class) || $class) . '::'};
-   use strict;
+   my $pkg_name = ref($class) || $class;
 
-   return exists $class_syms->{$what};
+   return $pkg_name->can($what)?1:0;
 }
 
 1;
