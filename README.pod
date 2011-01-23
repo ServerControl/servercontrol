@@ -13,3 +13,21 @@ This is the repository of the next ServerControl version.
 Perl 5.10
 
 =back
+
+=head2 Usage
+
+    servercontrol --schema=Debian \
+        --module=Apache \
+        --path=/myapaches/apache01 \
+        --user=www-data \
+        --group=www-data \
+        --name=apache01 \
+        --template=/opt/servercontrol/templates/apache2/httpd.conf \
+        --ip=127.0.0.1 \
+        --port=8889 \
+        --serveradmin=jan@pitahaya.local \
+        --internal_net=127.0.0.1
+    
+    cd /myapaches/apache01
+    ./start
+    ./stop
