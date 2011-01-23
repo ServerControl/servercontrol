@@ -54,7 +54,14 @@ sub simple_chown {
    chown($uid, $gid, @list);
 }
 
-sub cat_file { local(@ARGV, $/) = (@_); <> }
+sub cat_file { 
+   my $content = eval { local(@ARGV, $/) = (@_); <>; };
+
+   my $BR= $/;
+   if(wantarray) { return split(/$BR/, $content); }
+
+   $content;
+}
 
 sub put_file {
    my ($file, $content) = @_;
