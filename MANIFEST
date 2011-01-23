@@ -12,6 +12,8 @@ lib/ServerControl/Module/Base.pm
 lib/ServerControl/Schema.pm
 lib/ServerControl/Schema/Debian.pm
 lib/ServerControl/Schema/Debian/Apache.pm
+lib/ServerControl/Schema/MacPorts.pm
+lib/ServerControl/Schema/MacPorts/Apache.pm
 lib/ServerControl/Schema/Module.pm
 lib/ServerControl/Template.pm
 Makefile.PL
