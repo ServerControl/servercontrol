@@ -14,7 +14,7 @@ use Data::Dumper;
 use vars qw($ARGS);
 
 sub get {
-   return $ARGS;
+   return $ARGS || {};
 }
 
 sub set {
