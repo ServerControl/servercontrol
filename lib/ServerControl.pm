@@ -12,6 +12,7 @@ use warnings;
 use ServerControl::Args;
 use ServerControl::Template;
 use ServerControl::Commons::FS;
+use ServerControl::Schema;
 
 use Data::Dumper;
 use Getopt::Long qw(:config pass_through);

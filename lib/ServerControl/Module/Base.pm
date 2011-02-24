@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use ServerControl::Module;
+use ServerControl::Extension;
 use ServerControl::Exception::Schema::NotFound;
 
 use base qw(ServerControl::Module);
@@ -17,15 +18,23 @@ use base qw(ServerControl::Module);
 use Data::Dumper;
 
 __PACKAGE__->Parameter(
-   help   => { isa => 'bool', call => sub { __PACKAGE__->help; } },
-   conf   => { isa => 'string', call => sub { shift; __PACKAGE__->conf(@_); } },
-   load   => { isa => 'string', call => sub { shift; __PACKAGE__->load(@_); } },
-   schema => { isa => 'string', call => sub { shift; __PACKAGE__->load_schema(@_); } }
+   help      => { isa => 'bool',   call => sub { shift; __PACKAGE__->help;               } },
+   conf      => { isa => 'string', call => sub { shift; __PACKAGE__->conf(@_);           } },
+   load      => { isa => 'string', call => sub { shift; __PACKAGE__->load(@_);           } },
+   schema    => { isa => 'string', call => sub { shift; __PACKAGE__->load_schema(@_);    } },
+   extension => { isa => 'string', call => sub { shift; __PACKAGE__->load_extension(@_); } },
 );
 
 sub help {
    my ($class) = @_;
-   print "Help\n";
+   print "ServerControl - Version: " . $ServerControl::VERSION . "\n";
+   print "\n";
+   printf "  %-20s%s\n", "--help", "Display this help message";
+   printf "  %-20s%s\n", "--module", "Load specified module";
+   printf "  %-20s%s\n", "--schema", "Load specified schema";
+
+   print "\n";
+   exit 0;
 }
 
 sub conf {
@@ -54,6 +63,25 @@ sub load_schema {
    if($@) {
       print "$@\n";
       die (ServerControl::Exception::Schema::NotFound->new);
+   }
+}
+
+sub load_extension {
+   my ($class, $ext) = @_;
+
+   my $ext_class = "ServerControl::Extension::$class";
+   my $ext_class_file = "ServerControl/Extension/$class.pm";
+
+   ServerControl->d_print("ext_class: $ext_class\n");
+   ServerControl->d_print("ext_class_file: $ext_class_file\n");
+
+   eval {
+      require $ext_class_file;
+      $ext_class->import;
+   };
+
+   if($@) {
+      die ("$@\n");
    }
 }
 

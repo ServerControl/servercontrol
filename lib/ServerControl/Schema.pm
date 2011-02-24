@@ -31,6 +31,11 @@ sub load_schema_module {
    my $schema = ServerControl::Args->get->{'schema'};
    my $module = ServerControl::Args->get->{'module'};
 
+   unless($schema && $module) {
+      ServerControl->d_print("no schema or module given.\n");
+      exit 1;
+   }
+
    my $class_name = "ServerControl::Schema::${schema}::$module";
    my $class_file_name = "ServerControl/Schema/$schema/$module.pm";
 
