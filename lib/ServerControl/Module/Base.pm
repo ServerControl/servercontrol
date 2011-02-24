@@ -34,7 +34,6 @@ sub help {
    printf "  %-20s%s\n", "--schema", "Load specified schema";
 
    print "\n";
-   exit 0;
 }
 
 sub conf {
