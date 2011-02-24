@@ -26,7 +26,8 @@ Perl 5.10
         --ip=127.0.0.1 \
         --port=8889 \
         --serveradmin=jan@pitahaya.local \
-        --internal_net=127.0.0.1
+        --internal_net=127.0.0.1 \
+        --create
     
     cd /myapaches/apache01
     ./start

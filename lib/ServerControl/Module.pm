@@ -187,7 +187,7 @@ sub get_path {
 sub get_name {
    my ($class) = @_;
 
-   return ServerControl::Args->get->{'name'};
+   return ServerControl::Args->get->{'name'} || '';
 }
 
 sub get_directories {
