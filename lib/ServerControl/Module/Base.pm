@@ -68,8 +68,8 @@ sub load_schema {
 sub load_extension {
    my ($class, $ext) = @_;
 
-   my $ext_class = "ServerControl::Extension::$class";
-   my $ext_class_file = "ServerControl/Extension/$class.pm";
+   my $ext_class = "ServerControl::Extension::$ext";
+   my $ext_class_file = "ServerControl/Extension/$ext.pm";
 
    ServerControl->d_print("ext_class: $ext_class\n");
    ServerControl->d_print("ext_class_file: $ext_class_file\n");

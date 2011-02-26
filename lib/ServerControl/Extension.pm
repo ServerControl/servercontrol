@@ -14,7 +14,10 @@ use vars qw($EXTENSIONS);
 sub register {
    my ($class, $hook, $sub) = @_;
    if(! defined $EXTENSIONS->{$hook}) { $EXTENSIONS->{$hook} = []; }
-   push(@{$EXTENSIONS->{$hook}}, $sub);
+   push( @{$EXTENSIONS->{$hook}}, {
+      class => $class,
+      code  => $sub,
+   } );
 }
 
 sub get {

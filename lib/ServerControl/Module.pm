@@ -27,6 +27,8 @@ sub Parameter {
 
    if($class ne 'ServerControl::Module::Base') {
       $params->{'create'} = { isa => 'bool',   call => sub {
+                                                               $class->_call_extensions('before_create');
+
                                                                $class->create_directories;
                                                                $class->create_files;
 
@@ -36,17 +38,25 @@ sub Parameter {
 
                                                                $class->create_control_scripts;
                                                                $class->create_instance_conf;
+
+                                                               $class->_call_extensions('after_create');
                                                            } };
 
       $params->{'start'} = { isa => 'bool', call => sub {
+
                                                             ServerControl->d_print("Starting instance\n");
 
                                                             my $wd = getcwd;
                                                             chdir(ServerControl::Args->get->{'path'});
 
+                                                            $class->_call_extensions('before_start');
+
                                                             $class->start;
 
+                                                            $class->_call_extensions('after_start');
+
                                                             chdir($wd);
+
                                                         } };
       $params->{'stop'} = { isa => 'bool', call => sub {
                                                             ServerControl->d_print("Stopping instance\n");
@@ -54,7 +64,11 @@ sub Parameter {
                                                             my $wd = getcwd;
                                                             chdir(ServerControl::Args->get->{'path'});
 
+                                                            $class->_call_extensions('before_stop');
+
                                                             $class->stop;
+
+                                                            $class->_call_extensions('after_stop');
 
                                                             chdir($wd);
                                                         } };
@@ -64,7 +78,11 @@ sub Parameter {
                                                             my $wd = getcwd;
                                                             chdir(ServerControl::Args->get->{'path'});
 
+                                                            $class->_call_extensions('before_restart');
+
                                                             $class->restart;
+
+                                                            $class->_call_extensions('after_restart');
 
                                                             chdir($wd);
                                                         } };
@@ -75,7 +93,11 @@ sub Parameter {
                                                             my $wd = getcwd;
                                                             chdir(ServerControl::Args->get->{'path'});
 
+                                                            $class->_call_extensions('before_reload');
+
                                                             $class->reload;
+
+                                                            $class->_call_extensions('after_reload');
 
                                                             chdir($wd);
                                                         } };
@@ -86,6 +108,8 @@ sub Parameter {
                                                             my $wd = getcwd;
                                                             chdir(ServerControl::Args->get->{'path'});
 
+                                                            $class->_call_extensions('before_status');
+
                                                             my $ret = $class->status;
                                                             if($ret) {
                                                                ServerControl->d_print("Running\n");
@@ -94,6 +118,8 @@ sub Parameter {
                                                                ServerControl->d_print("Stopped\n");
                                                                exit 1;
                                                             }
+
+                                                            $class->_call_extensions('after_status');
 
                                                             chdir($wd);
                                                         } };
@@ -293,6 +319,24 @@ sub create_instance_conf {
       push (@instance_conf, "$key=$val");
    }
    put_file($class->get_path . '/conf/instance.conf', join("\n", @instance_conf));
+}
+
+sub _call_extensions {
+   my ($class, $hook) = @_;
+
+   ServerControl->d_print("Looking for extension code ($hook)\n");
+
+   my $extensions = ServerControl::Extension->get($hook);
+
+   for my $ext ( @{$extensions} ) {
+      # call extension code
+      my $ext_class = $ext->{'class'};
+      my $code  = $ext->{'code'};
+
+      ServerControl->d_print("Found Extension in $ext_class\n");
+
+      $ext_class->$code($class);
+   }
 }
 
 1;
