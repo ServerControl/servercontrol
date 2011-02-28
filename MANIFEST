@@ -7,8 +7,10 @@ lib/ServerControl/Commons/Process.pm
 lib/ServerControl/Exception.pm
 lib/ServerControl/Exception/Schema/ModuleNotFound.pm
 lib/ServerControl/Exception/Schema/NotFound.pm
+lib/ServerControl/Extension.pm
 lib/ServerControl/Module.pm
 lib/ServerControl/Module/Base.pm
+lib/ServerControl/Module/PidFile.pm
 lib/ServerControl/Schema.pm
 lib/ServerControl/Schema/Debian.pm
 lib/ServerControl/Schema/MacPorts.pm
