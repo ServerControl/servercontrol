@@ -23,7 +23,7 @@ sub recursive_mkdir {
    my ($dir, $mode) = @_;
    $mode ||= 0755;
 
-   my @tupel = split(/\//, $dir);
+   my @tupel = split(/\/+/, $dir);
 
    my $wd = getcwd;
 
@@ -66,7 +66,7 @@ sub cat_file {
 sub put_file {
    my ($file, $content) = @_;
 
-   open(my $fh, ">", $file) or die($!);
+   open(my $fh, ">", $file) or die("$file: $!");
    print $fh $content;
    close($fh);
 }

@@ -240,6 +240,8 @@ sub create_directories {
    ServerControl->d_print("Creating directroy structure\n");
    my $path = $class->get_path;
    
+   recursive_mkdir($path);
+
    my $dirs = $class->get_directories;
    for my $dir (keys %{$dirs}) {
       my $c = $dirs->{$dir};
