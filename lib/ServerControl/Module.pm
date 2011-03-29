@@ -207,7 +207,10 @@ sub load_module {
 sub get_path {
    my ($class) = @_;
 
-   return ServerControl::Args->get->{'path'};
+   my $p = ServerControl::Args->get->{'path'};
+   $p =~ s/(.*)\/+$/$1/;	# strip trailing slashes
+   $p =~ s/\/{2,}/\//g;		# simplify slashes
+   return $p;
 }
 
 sub get_name {

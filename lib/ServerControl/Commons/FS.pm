@@ -23,6 +23,7 @@ sub recursive_mkdir {
    my ($dir, $mode) = @_;
    $mode ||= 0755;
 
+   $dir =~ s/(.*)\/+$/$1/;	# stip trailing slashes
    my @tupel = split(/\/+/, $dir);
 
    my $wd = getcwd;
