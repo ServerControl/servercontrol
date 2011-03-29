@@ -246,6 +246,11 @@ sub create_directories {
       recursive_mkdir($path . '/' . $dir, $c->{'chmod'});
       simple_chown($c->{'user'}, $c->{'group'}, $path . '/' . $dir);
    }
+
+   if(exists $dirs->{"."}) {
+      chmod( $dirs->{"."}->{"chmod"}, $path );
+      simple_chown( $dirs->{"."}->{"user"}, $dirs->{"."}->{"group"}, $path );
+   }
 }
 
 sub create_files {
