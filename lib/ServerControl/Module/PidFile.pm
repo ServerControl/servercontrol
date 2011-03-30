@@ -24,6 +24,7 @@ sub stop {
    chomp $pid;
 
    kill 15, $pid;
+   unlink $pid_file;	# remove pid file
 }
 
 sub status {
