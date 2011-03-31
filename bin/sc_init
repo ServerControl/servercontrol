@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use File::Basename;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 #======================================================================
 
@@ -58,7 +58,7 @@ MAIN:
 
 Please invoke this Script by Symlinks, eg:
 
-/opt/sc/memcache/instance1/init -> /usr/local/bin/sc_init
+/opt/sc/memcache/instance1/init -> /usr/bin/sc_init
 /etc/init.d/memcache_instance1 -> /opt/sc/memcache/instance1/init
 /etc/rc2.d/S90memcache_instance1 -> /etc/init.d/memcache_instance1
 
@@ -87,7 +87,7 @@ sc_init will by invoked by Runlevel Symlinks:
 
 for Example:
 
- /opt/sc/memcache/instance1/init -> /usr/local/bin/sc_init
+ /opt/sc/memcache/instance1/init -> /usr/bin/sc_init
  /etc/init.d/memcache_instance1 -> /opt/sc/memcache/instance1/init
  /etc/rc2.d/S90memcache_instance1 -> /etc/init.d/memcache_instance1
 

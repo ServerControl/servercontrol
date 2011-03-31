@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use File::Basename;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 #======================================================================
 
@@ -54,9 +54,9 @@ MAIN:
 		print STDERR "No Installation at \"/opt/sc/$service/$instance\" found\n\n"; exit 1;
 	}
 
-	if ( ! -x "/usr/local/bin/sc_init" )
+	if ( ! -x "/usr/bin/sc_init" )
 	{
-		print STDERR "No \"sc_init\" found in /usr/local/bin, please install it\n\n"; exit 1;
+		print STDERR "No \"sc_init\" found in /usr/bin, please install it\n\n"; exit 1;
 	}
 
 	if ( ! -e "/etc/init.d/$init_name" && $mode ne "create" )
@@ -98,8 +98,8 @@ MAIN:
 	}
 	else	# create
 	{
-		d_print "symlink /usr/local/bin/sc_init to /opt/sc/$service/$instance/init";
-		symlink "/usr/local/bin/sc_init", "/opt/sc/$service/$instance/init";
+		d_print "symlink /usr/bin/sc_init to /opt/sc/$service/$instance/init";
+		symlink "/usr/bin/sc_init", "/opt/sc/$service/$instance/init";
 		print "Created init Link in /opt/sc/$service/$instance/init\n";
 
 		d_print "symlink /opt/sc/$service/$instance/init to /etc/init.d/$init_name";
@@ -145,7 +145,7 @@ sc_updaterc memcache_instance1 create
 
 This will install Symlinks for
 
- /opt/sc/memcache/instance1/init -> /usr/local/bin/sc_init 
+ /opt/sc/memcache/instance1/init -> /usr/bin/sc_init 
  /etc/init.d/memcache_instance1 -> /opt/sc/memcache/instance1/init
 
 =head2 Enable the automatic Start due to System Startup
