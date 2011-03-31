@@ -1,0 +1,181 @@
+#!/usr/bin/env perl
+#
+# (c) Juergen Brunk <juergen.brunk.de@googlemail.com>
+# 
+# vim: set ts=3 sw=3 tw=0:
+# vim: set expandtab:
+
+use strict;
+use warnings;
+use File::Basename;
+
+our $VERSION = "0.10";
+
+#======================================================================
+
+$|++;	# autoflushing
+
+my $DEPENDFILE = "/etc/init.d/.depend.start";
+my $PROGNAME = fileparse($0);
+
+sub d_print 
+{
+	my ($msg) = join("", @_);
+
+	print STDERR "[DEBUG] $msg\n" if (defined($ENV{'DEBUG'}));
+}
+
+MAIN:
+{
+	my ($init_name, $service, $instance, $mode, $old_content, $new_content);
+
+	($init_name, $mode) = @ARGV;
+
+	print "\n$PROGNAME v$VERSION\n\n";
+
+	if ( $> != 0 )
+	{
+		print STDERR "Please run me as root\n\n"; exit 1;
+	}
+
+	if ( !defined($init_name) || !defined($mode) || ($mode !~ /^(on|off|create)$/) )
+	{
+		print STDERR "Usage: $PROGNAME <service_instance> <on|off|create>\n\teg. $PROGNAME memcache_instance1 create\n"; exit 1;
+	}
+
+	($service, $instance) = split '_', $init_name;
+	if ( !defined($service) || !defined($instance) )
+	{
+		print STDERR "Can't determine <service> and/or <instance>\n\n"; exit 1;
+	}
+
+	if ( ! -e "/opt/sc/$service/$instance" )
+	{
+		print STDERR "No Installation at \"/opt/sc/$service/$instance\" found\n\n"; exit 1;
+	}
+
+	if ( ! -x "/usr/local/bin/sc_init" )
+	{
+		print STDERR "No \"sc_init\" found in /usr/local/bin, please install it\n\n"; exit 1;
+	}
+
+	if ( ! -e "/etc/init.d/$init_name" && $mode ne "create" )
+	{
+		print STDERR "Service \"$init_name\" not found in /etc/init.d/\n\n"; exit 1;
+	}
+
+	if ( ! -e $DEPENDFILE )
+	{	
+		print STDERR "Dependencies File $DEPENDFILE not found\n\n"; exit 1;
+	}
+
+	d_print "$0 invoked with: ", @ARGV;
+
+	if ( $mode ne "create" )
+	{
+		local $/ = undef;
+		d_print "Read in $DEPENDFILE";
+		open my $fh, '<', $DEPENDFILE || die "Can't open $DEPENDFILE: $!";
+		$old_content = <$fh>; $new_content = $old_content;
+		close $fh;
+		d_print "Content of $DEPENDFILE:\n$old_content\n";
+	}
+
+	if ( $mode eq "on" )
+	{
+		$new_content =~ s/(TARGETS\s*=\s*.*)\n/$1 $init_name\n/ unless $old_content =~ /TARGETS.*\s+$init_name/;
+		print "Installed Dependencies for Service: $init_name\n";
+		symlink "/etc/init.d/$init_name", "/etc/rc2.d/S90$init_name" || die "Can't create Symlink: $!";
+		print "Installed Symlinks for Service: $init_name\n";
+	}
+	elsif ( $mode eq "off" )
+	{
+		$new_content =~ s/^$init_name:.*\n//mg;
+		$new_content =~ s/\s+$init_name/ /g;
+		print "Removed Dependencies for Service: $init_name\n";
+		unlink "/etc/rc2.d/S90$init_name" || die "Can't remove Symlink: $!";
+		print "Removed Symlinks for Service: $init_name\n";
+	}
+	else	# create
+	{
+		d_print "symlink /usr/local/bin/sc_init to /opt/sc/$service/$instance/init";
+		symlink "/usr/local/bin/sc_init", "/opt/sc/$service/$instance/init";
+		print "Created init Link in /opt/sc/$service/$instance/init\n";
+
+		d_print "symlink /opt/sc/$service/$instance/init to /etc/init.d/$init_name";
+		symlink "/opt/sc/$service/$instance/init", "/etc/init.d/$init_name";
+		print "Created Start Link in /etc/init.d/$init_name for Service: $service, Instance: $instance\n";
+	}
+	
+	d_print "new Content of $DEPENDFILE:\n$new_content\n" if ( $mode ne "create" );
+		
+	if ( ($mode ne "create") && ($new_content ne $old_content) )
+	{
+		system("cp $DEPENDFILE ${DEPENDFILE}.bak");
+		d_print "Write out $DEPENDFILE";
+		open my $fh, '>', $DEPENDFILE || die "Can't open $DEPENDFILE: $!";
+		print $fh $new_content || die "Can't update $DEPENDFILE: $!";
+		close $fh;
+	}
+
+	print "\n";
+	exit 0;
+}
+
+
+__END__
+
+=head1 NAME
+
+sc_updaterc - create and handle Runlevel Symlinks for ServerControl Instances.
+
+=head1 AUTHOR
+
+Juergen Brunk <juergen.brunk.de@googlemail.com>
+
+=head1 DESCRIPTION
+
+sc_updaterc should be used after a new ServerControl Instance was installed.
+
+Usage: sc_updaterc <service_instance> <on|off|create>
+
+=head2 Create the Init Symlink
+
+sc_updaterc memcache_instance1 create
+
+This will install Symlinks for
+
+ /opt/sc/memcache/instance1/init -> /usr/local/bin/sc_init 
+ /etc/init.d/memcache_instance1 -> /opt/sc/memcache/instance1/init
+
+=head2 Enable the automatic Start due to System Startup
+
+sc_updaterc memcache_instance1 on
+ 
+This will install a Symlink for
+
+ /etc/rc2.d/S90memcache_instance1 -> /etc/init.d/memcache_instance1/init
+
+and add an Entry into
+
+ /etc/init.d/.depend.start
+
+=head2 Disable the automatic Start
+
+sc_updaterc memcache_instance1 off
+
+This will remove the Symlink for
+
+ /etc/rc2.d/S90memcache_instance1 -> /etc/init.d/memcache_instance1/init
+
+and removes the Entry for
+
+ /etc/init.d/.depend.start
+
+=head1 BUGS
+
+ o only tested with Debian 6.x Squeeze
+ o Pathnames to /opt/sc/ mandatory and hardcoded
+
+=cut
+
