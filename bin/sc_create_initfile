@@ -1,0 +1,244 @@
+#!/usr/bin/env perl
+#
+# (c) Juergen Brunk <juergen.brunk.de@googlemail.com>
+# 
+# vim: set ts=3 sw=3 tw=0:
+# vim: set expandtab:
+
+use strict;
+use warnings;
+use File::Basename;
+use Getopt::Long;
+
+our $VERSION = "0.10";
+
+#======================================================================
+
+$|++;	# autoflushing
+
+my $INITPATH = "/etc/init.d";
+my $PROGNAME = fileparse($0);
+my $TEMPLATE;
+
+#======================================================================
+
+# debugging output only if $ENV{'DEBUG'}
+sub d_print 
+{
+	my ($msg) = join("", @_);
+
+	print STDERR "[DEBUG] $msg\n" if (defined($ENV{'DEBUG'}));
+}
+
+#======================================================================
+
+# simple usage printout
+sub usage
+{
+	print STDERR "Usage: $PROGNAME --path=/path/to/instance --name=init_name\n\n";
+	print STDERR "\teg. $PROGNAME --path=/opt/sc/memcache/instance1 --name=memcache_instance1\n\n";
+}
+
+#======================================================================
+
+# main program routine
+MAIN:
+{
+	my ($init_name, $instancepath, $initfile, $result, $link, $content, $fh);
+
+
+	print "\n$PROGNAME v$VERSION\n\n";
+
+	# must run as root
+	if ( $> != 0 )
+	{
+		print STDERR "Please run me as root !\n\n"; exit 1;
+	}
+
+	# parse command line options
+	$result = GetOptions(
+		"path=s"	=> \$instancepath,
+		"name=s"	=> \$init_name
+	);
+
+	# check if all options are given with values
+	if ( !$result || !defined($init_name) || !defined($instancepath) )
+	{
+		usage(); exit 1;
+	}
+
+	# check if the servercontrol instance is valid
+	$link = readlink "${instancepath}/start";
+	d_print "readlink ${instancepath}/start = $link";
+	if ( ! -e $instancepath || !defined($link) || $link !~ /servercontrol/ )
+	{
+		print STDERR "No Servercontrol Instance found at \"$instancepath\" !\n\n"; exit 1;
+	}
+
+	# check if a runlevel script with same name already exists
+	$initfile = "${INITPATH}/$init_name";
+	if ( -e $initfile )
+	{
+		print STDERR "A Runlevel Script at \"$initfile\" already exists !\n\n"; exit 1;
+	}
+
+	$content = $TEMPLATE;
+	d_print "Content:\n$content\n";
+
+	# substitute place holders
+	$content =~ s/\@instance\@/$init_name/g;
+	$content =~ s/\@instancepath\@/$instancepath/g;
+
+	# write out runlevel script
+	d_print "Write out to $initfile:\n$content\n";
+	open $fh, '>', $initfile || die "Can't open $initfile: $!";
+	print $fh $content || die "Can't write to $initfile: $!";
+	close $fh;
+
+	# fix permissions
+	system("chmod 0755 $initfile; chown root:root $initfile");
+
+	print "\nCreated runlevel script at \"$initfile\"\n\n";
+	exit 0;
+}
+
+#======================================================================
+
+BEGIN
+{
+	$TEMPLATE = '#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          @instance@
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: initscript for a servercontrol instance
+# Description:       initscript for @instance@
+### END INIT INFO
+
+# Author: Juergen Brunk <juergen.brunk.de@googlemail.com>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/sbin:/usr/local/bin
+NAME="@instance@"
+DESC="servercontrol instance"
+INSTANCEPATH="@instancepath@"
+
+# Exit if the package is not installed
+[ -x "$INSTANCEPATH/start" ] || exit 0
+
+# Read configuration variable file if it is present
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.2-14) to ensure that this file is present
+# and status_of_proc is working.
+. /lib/lsb/init-functions
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{
+	# Return
+	#   0 if daemon has been started
+	#   1 if daemon was already running
+	#   2 if daemon could not be started
+	
+	${INSTANCEPATH}/start 		
+	RETVAL="$?"
+	return "$RETVAL"
+}
+
+#
+# Function that stops the daemon/service
+#
+do_stop()
+{
+	# Return
+	#   0 if daemon has been stopped
+	#   1 if daemon was already stopped
+	#   2 if daemon could not be stopped
+	#   other if a failure occurred
+	
+	${INSTANCEPATH}/stop 		
+	RETVAL="$?"
+	return "$RETVAL"
+}
+
+case "$1" in
+  start)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+	do_start
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+	;;
+  stop)
+	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+	do_stop
+	case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+	;;
+  status)
+       ${INSTANCEPATH}/status && exit 0 || exit $?
+       ;;
+  restart)
+	log_daemon_msg "Restarting $DESC" "$NAME"
+	do_stop
+	sleep 1
+	do_start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|status|restart}" >&2
+	exit 3
+	;;
+esac
+';
+}
+
+#======================================================================
+
+__END__
+
+=head1 NAME
+
+ sc_create_initfile - create a LSB conform Runlevel Start Script for ServerControl Instances
+
+=head1 AUTHOR
+
+ Juergen Brunk <juergen.brunk.de@googlemail.com>
+
+=head1 DESCRIPTION
+
+sc_create_initfile should be used after a new ServerControl Instance was installed
+
+ Usage: sc_create_initfile --path=/path/to/sc/instance --name=runlevel_scriptname
+
+=head2 Create the Runlevel Start Script
+
+ sc_create_initfile --path=/opt/sc/memcache/instance1 --name=memcache_instance1 
+
+ This will create a Runlevel Script at 
+ /etc/init.d/memcache_instance1
+
+=head2 Enable the automatic Start due to System Startup
+
+ update-rc.d memcache_instance1 defaults
+ 
+=head2 Disable the automatic Start
+
+ update-rc.d memcache_instance1 remove
+
+=head1 BUGS
+
+ o only tested with Debian 6.x Squeeze
+
+=cut
+
