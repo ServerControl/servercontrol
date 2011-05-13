@@ -125,7 +125,7 @@ sub Parameter {
                                                         } };
 
       $params->{'recreate'} = { isa => 'bool',   call => sub {
-                                                               $class->_call_extensions('before_create');
+                                                               $class->_call_extensions('before_recreate');
 
                                                                $class->create_control_scripts;
                                                                $class->create_instance_conf;
@@ -134,7 +134,7 @@ sub Parameter {
                                                                   $class->recreate; 
                                                                }
 
-                                                               $class->_call_extensions('after_create');
+                                                               $class->_call_extensions('after_recreate');
                                                            } };
 
 
