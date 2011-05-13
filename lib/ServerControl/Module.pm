@@ -124,6 +124,21 @@ sub Parameter {
                                                             chdir($wd);
                                                         } };
 
+      $params->{'recreate'} = { isa => 'bool',   call => sub {
+                                                               $class->_call_extensions('before_create');
+
+                                                               $class->create_control_scripts;
+                                                               $class->create_instance_conf;
+
+                                                               if($class->has('recreate')) {
+                                                                  $class->recreate; 
+                                                               }
+
+                                                               $class->_call_extensions('after_create');
+                                                           } };
+
+
+
    }
 
    no strict 'refs';
