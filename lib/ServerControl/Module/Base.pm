@@ -33,6 +33,7 @@ sub help {
    printf "  %-20s%s\n", "--help", "Display this help message";
    printf "  %-20s%s\n", "--module", "Load specified module";
    printf "  %-20s%s\n", "--schema", "Load specified schema";
+   printf "  %-20s%s\n", "--debug", "Turn debug mode on";
 
    print "\n";
 }
