@@ -23,7 +23,7 @@ __PACKAGE__->Parameter(
    load      => { isa => 'string', call => sub { shift; __PACKAGE__->load(@_);           } },
    schema    => { isa => 'string', call => sub { shift; __PACKAGE__->load_schema(@_);    } },
    extension => { isa => 'string', call => sub { shift; __PACKAGE__->load_extension(@_); } },
-   debug     => { isa => 'bool',   call => sub { $::debug = 1; },
+   debug     => { isa => 'bool',   call => sub { $::debug = 1; } },
 );
 
 sub help {
