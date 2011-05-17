@@ -23,6 +23,8 @@ use FindBin;
 our $VERSION = '0.92';
 our $MODULES = [];
 
+$::debug = 0;
+
 sub run {
    my ($class) = @_;
    my %opts;
@@ -80,7 +82,10 @@ sub get_instance_conf {
 
 sub d_print {
    my ($class, $msg) = @_;
-   print STDERR "[DEBUG] $msg";
+
+   if($::debug) {
+      print STDERR "[DEBUG] $msg";
+   }
 }
 
 1;
