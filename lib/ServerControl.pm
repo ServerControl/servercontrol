@@ -58,7 +58,16 @@ sub ctrl {
    my $conf = $class->get_instance_conf("$dir/conf/instance.conf");
 
    for my $key (keys %{$conf}) {
-      push(@ARGV, "--$key" . ($conf->{$key} ne "1"?"=".$conf->{$key}:""));
+      if($key =~ m/^\@/) {
+         my $tmpkey = substr($key, 1);
+         for my $tmpval (split(/,/, @{$conf->{$key}})) {
+            $tmpval =~ s/\s+//g;
+            push(@ARGV, "--$tmpkey" . "=$tmpval");
+         }
+      } 
+      else {
+         push(@ARGV, "--$key" . ($conf->{$key} ne "1"?"=".$conf->{$key}:""));
+      }
    }
 
    my $call = [ split(/\//, $0) ]->[-1];

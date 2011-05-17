@@ -22,7 +22,7 @@ __PACKAGE__->Parameter(
    conf      => { isa => 'string', call => sub { shift; __PACKAGE__->conf(@_);           } },
    load      => { isa => 'string', call => sub { shift; __PACKAGE__->load(@_);           } },
    schema    => { isa => 'string', call => sub { shift; __PACKAGE__->load_schema(@_);    } },
-   extension => { isa => 'string', call => sub { shift; __PACKAGE__->load_extension(@_); } },
+   extension => { isa => 'array', call => sub { shift; __PACKAGE__->load_extension(@_); } },
    debug     => { isa => 'bool',   call => sub { $::debug = 1; } },
 );
 

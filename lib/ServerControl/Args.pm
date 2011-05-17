@@ -24,12 +24,28 @@ sub set {
 sub import {
    foreach my $o (@ARGV) {
       my($key, $val) = ($o =~ m/^--(.*?)=(.*)$/);
-      if($key && $val) {
-         $ARGS->{$key} = $val;
-      } else
-      {
+      if(!$key && !$val) {
          $o =~ m/^--(.*?)$/;
-         $ARGS->{$1} = 1;
+         $key = $1;
+         $val = 1;
+      }
+
+      if(exists $ARGS->{$key}) {
+         my @tmp;
+         if(ref($ARGS->{$key})) {
+            @tmp = @{$ARGS->{$key}};
+         }
+         else {
+            @tmp = ($ARGS->{$key});
+         }
+
+         $ARGS->{$key} = [];
+         push @tmp, $val;
+
+         push(@{$ARGS->{$key}}, @tmp);
+      }
+      else {
+         $ARGS->{$key} = $val;
       }
    }
 }

@@ -192,6 +192,7 @@ sub get_options {
       switch ($opt->{'isa'}) {
          case 'bool'   { $ret{$key} = $opt->{'call'}; }
          case 'string' { $ret{"$key=s"} = $opt->{'call'}; }
+         case 'array'  { $ret{"$key=s@"} = $opt->{'call'}; }
       }
    }
 
@@ -340,6 +341,11 @@ sub create_instance_conf {
    for my $key (keys %{$args}) {
       my $val = $args->{$key};
       next if ($key eq 'create');
+
+      if(ref($val) eq "ARRAY") {
+         $val = join(",", @{$val});
+         $key = "\@$key";
+      }
 
       push (@instance_conf, "$key=$val");
    }
