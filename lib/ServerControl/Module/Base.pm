@@ -33,6 +33,7 @@ sub help {
    printf "  %-20s%s\n", "--help", "Display this help message";
    printf "  %-20s%s\n", "--module", "Load specified module";
    printf "  %-20s%s\n", "--schema", "Load specified schema";
+   printf "  %-20s%s\n", "--extension", "Add a servercontrol extension to the instance";
    printf "  %-20s%s\n", "--debug", "Turn debug mode on";
 
    print "\n";
@@ -40,12 +41,12 @@ sub help {
 
 sub conf {
    my ($class, $conf) = @_;
-   print "Conf: $conf\n";
+   ServerControl->d_print("Conf: $conf\n");
 }
 
 sub load {
    my ($class, $load) = @_;
-   print "Load: $load\n";
+   ServerControl->d_print("Load: $load\n");
 }
 
 sub load_schema {
@@ -62,7 +63,7 @@ sub load_schema {
    };
 
    if($@) {
-      print "$@\n";
+      ServerControl->d_print("$@\n");
       die (ServerControl::Exception::Schema::NotFound->new);
    }
 }
