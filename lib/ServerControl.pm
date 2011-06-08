@@ -20,7 +20,7 @@ use Getopt::Long qw(:config pass_through);
 use File::Basename qw(dirname);
 use FindBin;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 our $MODULES = [];
 
 $::debug = 0;
@@ -58,11 +58,9 @@ sub ctrl {
    my $conf = $class->get_instance_conf("$dir/conf/instance.conf");
 
    for my $key (keys %{$conf}) {
-      if($key =~ m/^\@/) {
-         my $tmpkey = substr($key, 1);
-         for my $tmpval (split(/,/, @{$conf->{$key}})) {
-            $tmpval =~ s/\s+//g;
-            push(@ARGV, "--$tmpkey" . "=$tmpval");
+      if(ref($conf->{$key}) eq "ARRAY") {
+         for my $ext (@{$conf->{$key}}) {
+            push(@ARGV, "--$key" . "=$ext");
          }
       } 
       else {
@@ -83,7 +81,13 @@ sub get_instance_conf {
    my @content = cat_file($file);
    for my $line (@content) {
       my($key, $val) = ($line =~ m/^(.*?)=(.*)$/);
-      $conf->{$key} = $val;
+      if($key =~ m/^\@/) {
+         my $tmpkey = substr($key, 1);
+         $conf->{$tmpkey} = [ split(/,/, $val) ];
+      } 
+      else {
+         $conf->{$key} = $val;
+      }
    }
 
    $conf;
