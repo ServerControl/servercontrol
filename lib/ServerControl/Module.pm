@@ -9,7 +9,6 @@ package ServerControl::Module;
 use strict;
 use warnings;
 
-use Switch;
 use File::Copy qw(copy);
 use Cwd qw(getcwd);
 use File::Basename qw(dirname);
@@ -189,10 +188,17 @@ sub get_options {
    my %ret;
    for my $key (keys %{$$parameter}) {
       my $opt = $$parameter->{$key};
-      switch ($opt->{'isa'}) {
-         case 'bool'   { $ret{$key} = $opt->{'call'}; }
-         case 'string' { $ret{"$key=s"} = $opt->{'call'}; }
-         case 'array'  { $ret{"$key=s@"} = $opt->{'call'}; }
+      if($opt->{'isa'} eq 'bool') {
+         $ret{$key} = $opt->{'call'};
+      } 
+      elsif($opt->{'isa'} eq 'string') {
+         $ret{"$key=s"} = $opt->{'call'};
+      }
+      elsif($opt->{'isa'} eq 'array') {
+         $ret{"$key=s@"} = $opt->{'call'};
+      }
+      else {
+         die("Unknown ISA");
       }
    }
 
