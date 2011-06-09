@@ -24,6 +24,7 @@ __PACKAGE__->Parameter(
    schema    => { isa => 'string', call => sub { shift; __PACKAGE__->load_schema(@_);    } },
    extension => { isa => 'array', call => sub { shift; __PACKAGE__->load_extension(@_); } },
    debug     => { isa => 'bool',   call => sub { $::debug = 1; } },
+   "no-control-links"     => { isa => 'bool',   call => sub { } },
 );
 
 sub help {
@@ -35,6 +36,7 @@ sub help {
    printf "  %-20s%s\n", "--schema", "Load specified schema";
    printf "  %-20s%s\n", "--extension", "Add a servercontrol extension to the instance";
    printf "  %-20s%s\n", "--debug", "Turn debug mode on";
+   printf "  %-20s%s\n", "--no-control-links", "Only create a ,,control'' symlink. Do not create start, stop, ... links.";
 
    print "\n";
 }

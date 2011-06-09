@@ -9,8 +9,6 @@ package ServerControl::Args;
 use strict;
 use warnings;
 
-use Data::Dumper;
-
 use vars qw($ARGS);
 
 sub get {
@@ -48,6 +46,7 @@ sub import {
          $ARGS->{$key} = $val;
       }
    }
+
 }
 
 1;

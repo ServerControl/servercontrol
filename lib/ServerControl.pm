@@ -47,7 +47,6 @@ sub run {
    my $mod       = ServerControl::Args->get->{'module'};
    my $mod_class = ServerControl::Module->load_module($mod);
 
-
    @ARGV = @ORIG_ARGV; # restore @ARGV for module parameter
    GetOptions($mod_class->get_options);
 
@@ -69,7 +68,9 @@ sub ctrl {
    }
 
    my $call = [ split(/\//, $0) ]->[-1];
-   push(@ARGV, "--$call");
+   unless($call eq "control") {
+      push(@ARGV, "--$call");
+   }
 
    ServerControl::Args->import;
 }

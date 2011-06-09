@@ -1,6 +1,8 @@
 servercontrol (0.93) unstable; urgency=low
   * added support for template directories
   * removed Switch
+  * added control script link
+  * added option to only create the control script link
 
  -- Jan Gehring <jan.gehring@gmail.com>  Wed, 08 Jun 2011 15:40:00 +0200
 

@@ -315,6 +315,13 @@ sub create_control_scripts {
    my $bin  = $0;
    my $path = $class->get_path;
 
+   my $args = ServerControl::Args->get;
+
+   if(exists $args->{"no-control-scripts"}) {
+      symlink($bin, "$path/control");
+      return;
+   }
+
    if($class->has('start')) {
       symlink($bin, "$path/start");
    }
