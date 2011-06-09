@@ -509,8 +509,6 @@ sub _read_fs_layout_files {
       }
    }
 
-   print Dumper($return);
-
    return $return;
 }
 
