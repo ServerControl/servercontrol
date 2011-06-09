@@ -48,9 +48,15 @@ sub run {
    my $mod       = ServerControl::Args->get->{'module'};
    my $mod_class = ServerControl::Module->load_module($mod);
 
-   @ARGV = @ORIG_ARGV; # restore @ARGV for module parameter
-   
-   {
+   @ARGV = (@ARGV, @ORIG_ARGV);
+
+   UNIQ: {
+      my %u;
+      @u{@ARGV} = 1;
+      @ARGV = keys %u;
+   };
+
+   MODULE: {
       local $SIG{'__WARN__'} = sub { die(ServerControl::Exception::Unknown->new(message => $_[0])); };
       GetOptions($mod_class->get_options);
    }
