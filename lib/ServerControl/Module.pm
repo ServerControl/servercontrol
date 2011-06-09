@@ -17,6 +17,8 @@ use Data::Dumper;
 
 use ServerControl::Commons::FS;
 use ServerControl::Commons::Object;
+use ServerControl::Exception::SyntaxError;
+use ServerControl::Exception::Unknown;
 
 use base qw(ServerControl::Commons::Object);
 
@@ -244,19 +246,33 @@ sub get_name {
 sub get_directories {
    my ($class) = @_;
 
-   no strict 'refs';
+   my $args = ServerControl::Args->get;
 
-   my $dirs = $class . '::dirs';
-   $$dirs;
+   if(exists $args->{"fs-layout"} && -f $args->{"fs-layout"}) {
+      return $class->_read_fs_layout_directories();
+   }
+   else {
+      no strict 'refs';
+
+      my $dirs = $class . '::dirs';
+      return $$dirs;
+   }
 }
 
 sub get_files {
    my ($class) = @_;
 
-   no strict 'refs';
+   my $args = ServerControl::Args->get;
 
-   my $files = $class . '::files';
-   $$files;
+   if(exists $args->{"fs-layout"} && -f $args->{"fs-layout"}) {
+      return $class->_read_fs_layout_files();
+   }
+   else {
+      no strict 'refs';
+
+      my $files = $class . '::files';
+      return $$files;
+   }
 }
 
 sub create_directories {
@@ -362,8 +378,13 @@ sub create_instance_conf {
 
       push (@instance_conf, "$key=$val");
    }
-   put_file($class->get_path . '/conf/instance.conf', join("\n", @instance_conf));
+
+   put_file($class->get_path . '/.instance.conf', join("\n", @instance_conf));
 }
+
+################################################################################
+# private methods
+################################################################################
 
 sub _call_extensions {
    my ($class, $hook) = @_;
@@ -382,5 +403,147 @@ sub _call_extensions {
       $ext_class->$code($class);
    }
 }
+
+# read the yaml file
+sub _read_yaml_file {
+   my ($class, $file) = @_;
+
+   my $c = eval { local(@ARGV, $/) = ($file); <>; };
+   my $struct;
+
+   eval {
+      require YAML;
+      $struct = YAML::Load($c);  
+   };
+
+   if($@) {
+      die(ServerControl::Exception::SyntaxError->new(message => $@));
+   }
+
+   return $struct;
+}
+
+# read the yaml file
+sub _read_fs_layout_directories {
+   my ($class, $file) = @_;
+
+   my $struct = ServerControl::FsLayout->get;
+
+   unless(exists $struct->{"Directories"}) {
+      die(ServerControl::Exception::Unknown->new(message => "Syntax Error in YAML file ($file). No ,,Directories'' found."));
+   }
+
+   my $dirs = $struct->{"Directories"};
+
+   my $return = {};
+
+   ### read directories
+   for my $section (qw/Base Configuration Runtime/) {
+      for my $key ( keys %{$dirs->{$section}} ) {
+         my $dirdef = $dirs->{$section}->{$key};
+
+         $return->{$dirdef->{"name"}} = {
+            chmod  => oct($class->_parse_fslayout_option($dirdef->{"chmod"})),
+            user   => $class->_parse_fslayout_option($dirdef->{"user"}),
+            group  => $class->_parse_fslayout_option($dirdef->{"group"}),
+         };
+      }
+   }
+
+   return $return;
+}
+
+sub _parse_fslayout_options_recursive {
+   my ($class, $tmp) = @_;
+
+   for my $key (keys %{$tmp}) {
+      if(ref($tmp->{$key}) eq "HASH") {
+         $class->_parse_fslayout_options_recursive($tmp->{$key});
+      }
+      else {
+         $tmp->{$key} = $class->_parse_fslayout_option($tmp->{$key});
+      }
+   }
+
+   return $tmp;
+}
+
+# read the yaml file
+sub _read_fs_layout_files {
+   my ($class, $file) = @_;
+
+   my $struct = ServerControl::FsLayout->get;
+
+   unless(exists $struct->{"Files"}) {
+      die(ServerControl::Exception::Unknown->new(message => "Syntax Error in YAML file ($file). No ,,Files'' found."));
+   }
+
+   my $files = $struct->{"Files"};
+
+   my $return = {};
+
+   unless(exists $files->{"Exec"}) {
+      die(ServerControl::Exception::Unknown->new(message => "Syntax Error in YAML file ($file). No Exec configuration found under Files."));
+   }
+
+
+   for my $section (qw/ Exec Base Configuration /) {
+      unless(exists $files->{$section}) {
+         next;
+      }
+
+      for my $filename (keys %{$files->{$section}}) {
+         my $filedef = $files->{$section}->{$filename};
+
+         if(exists $filedef->{"link"}) {
+            $return->{$class->_parse_fslayout_option($filedef->{"name"})} = {
+               link => $class->_parse_fslayout_option($filedef->{"link"}),
+            };
+         }
+         elsif(exists $filedef->{"call"}) {
+            $return->{$class->_parse_fslayout_option($filedef->{"name"})} = {
+               call => $class->_parse_fslayout_option($filedef->{"call"}),
+            };
+         }
+ 
+      }
+   }
+
+   print Dumper($return);
+
+   return $return;
+}
+
+# parses the value of the yaml key.
+# checks if <% ... %> is in it and tries to evaluate it
+# otherwise, return it unmodified
+sub _parse_fslayout_option {
+   my ($class, $opt) = @_;
+
+   if($opt =~ m/<%=.*?%>/) {
+      $opt =~ s/(<%=(.*?)%>)/$class->_evaluate_template_param($2)/gems;
+   }
+
+   elsif($opt =~ m/<%(.*?)%>/) {
+      $opt = $class->_evaluate_template_param($1);
+   }
+
+   return $opt;
+}
+
+# this method will evaluate the template parameters
+# given in the the yaml fslayout files.
+sub _evaluate_template_param {
+   my ($class, $param) = @_;
+
+   my $val = eval "$param";
+   if($@) {
+      die(ServerControl::Exception::SyntaxError->new(message => "Error evaluating template parameter. $@"));
+   }
+   
+   return $val;
+}
+
+
 
 1;

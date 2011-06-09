@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 use ServerControl::Args;
+use ServerControl::FsLayout;
 use ServerControl::Template;
 use ServerControl::Commons::FS;
 use ServerControl::Schema;
@@ -30,31 +31,35 @@ sub run {
    my %opts;
    my @opts;
 
+   my @ORIG_ARGV = @ARGV;
+
    my $exec_path = $FindBin::Bin;
-   if( -f "$exec_path/conf/instance.conf") {
+   if( -f "$exec_path/.instance.conf") {
       # wenn in einer instanz, dann ServerControl::ctrl ausfuehren
       # um die instanz zu verwalten.
       $class->ctrl($exec_path);
    }
-
-   my @ORIG_ARGV = @ARGV;
+ 
+   # lade schema
+   ServerControl::Schema->load_schema_module;
 
    GetOptions(ServerControl::Module::Base->get_options);
-
-   ServerControl::Schema->load_schema_module;
-   # ServerControl::Schema->get('httpd');
-   
+  
    my $mod       = ServerControl::Args->get->{'module'};
    my $mod_class = ServerControl::Module->load_module($mod);
 
    @ARGV = @ORIG_ARGV; # restore @ARGV for module parameter
-   GetOptions($mod_class->get_options);
+   
+   {
+      local $SIG{'__WARN__'} = sub { die(ServerControl::Exception::Unknown->new(message => $_[0])); };
+      GetOptions($mod_class->get_options);
+   }
 
 }
 
 sub ctrl {
    my ($class, $dir) = @_;
-   my $conf = $class->get_instance_conf("$dir/conf/instance.conf");
+   my $conf = $class->get_instance_conf("$dir/.instance.conf");
 
    for my $key (keys %{$conf}) {
       if(ref($conf->{$key}) eq "ARRAY") {

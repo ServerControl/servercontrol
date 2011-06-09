@@ -9,6 +9,7 @@ package ServerControl::Module::Base;
 use strict;
 use warnings;
 
+use ServerControl::FsLayout;
 use ServerControl::Module;
 use ServerControl::Extension;
 use ServerControl::Exception::Schema::NotFound;
@@ -25,6 +26,28 @@ __PACKAGE__->Parameter(
    extension => { isa => 'array', call => sub { shift; __PACKAGE__->load_extension(@_); } },
    debug     => { isa => 'bool',   call => sub { $::debug = 1; } },
    "no-control-links"     => { isa => 'bool',   call => sub { } },
+   "fs-layout"            => { isa => 'string',   call => sub { my $class = shift;
+                                                                  unless(-f $_[0]) {
+                                                                     ServerControl->d_print("File not found! $_[0]\n");
+                                                                     die;
+                                                                  }
+
+                                                                  ServerControl->d_print("Loading YAML: $_[0]\n");
+
+                                                                  eval {
+                                                                     require YAML;
+                                                                     my $s = eval { local(@ARGV, $/) = ($_[0]); <>; };
+                                                                     my $tmp = YAML::Load($s);
+
+                                                                     $tmp = __PACKAGE__->_parse_fslayout_options_recursive($tmp);
+                                                                     ServerControl::FsLayout->set($tmp);
+                                                                  };
+
+                                                                  if($@) {
+                                                                     die("Error loading YAML! $@");
+                                                                  }
+
+                                                               } },
 );
 
 sub help {
