@@ -23,6 +23,9 @@ sub parse {
    # wenn $dest_file && $source_file ein verzeichnis ist, dann das ganze verzeichnis als template verwenden
    if(-d $source_file) {
       my $to_dir = dirname($dest_file);
+      if(-d $dest_file) {
+         $to_dir = $dest_file;
+      }
       my @dirs = ($source_file);
       my $base_dir = $source_file;
       for my $dir (@dirs) {
@@ -48,8 +51,6 @@ sub parse {
 
          closedir($dh);
       }
-
-      exit;
    } else {
       my $t_content = cat_file($source_file);
       for my $key (keys %{$data}) {
