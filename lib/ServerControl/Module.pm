@@ -333,7 +333,7 @@ sub create_control_scripts {
 
    my $args = ServerControl::Args->get;
 
-   if(exists $args->{"no-control-scripts"}) {
+   if(exists $args->{"no-control-links"}) {
       symlink($bin, "$path/control");
       return;
    }
