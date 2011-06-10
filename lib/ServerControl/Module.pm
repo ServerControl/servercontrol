@@ -306,12 +306,6 @@ sub create_files {
    for my $file (keys %{$files}) {
       my $c = $files->{$file};
 
-      # wenn scalar, dann nur symlinken
-      unless(ref($c)) {
-         symlink($c, $path . '/' . $file);
-         next;
-      }
-
       if(exists $c->{'call'}) {
          my $code = $c->{'call'};
          &$code($path . '/' . $file);
