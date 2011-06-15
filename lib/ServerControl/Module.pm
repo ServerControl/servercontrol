@@ -20,7 +20,45 @@ use ServerControl::Commons::Object;
 use ServerControl::Exception::SyntaxError;
 use ServerControl::Exception::Unknown;
 
-use base qw(ServerControl::Commons::Object);
+require Exporter;
+
+use vars qw($SKIP @EXPORT);
+@EXPORT = qw(skip_start skip_stop skip_status skip_restart);
+
+use base qw(ServerControl::Commons::Object Exporter);
+
+
+$SKIP = {
+   start    => 0,
+   stop     => 0,
+   restart  => 0,
+   status   => 0,
+   reload   => 0,
+   create   => 0,
+   recreate => 0,
+};
+
+##################################################################
+# skip functions
+##################################################################
+
+sub skip_start {
+   $SKIP->{"start"} = 1;
+}
+
+sub skip_stop {
+   $SKIP->{"stop"} = 1;
+}
+
+sub skip_status {
+   $SKIP->{"status"} = 1;
+}
+
+sub skip_restart {
+   $SKIP->{"restart"} = 1;
+}
+
+##################################################################
 
 sub Parameter {
    my $class  = shift;
@@ -52,7 +90,7 @@ sub Parameter {
 
                                                             $class->_call_extensions('before_start');
 
-                                                            $class->start;
+                                                            $class->start unless($SKIP->{"start"} == 1);
 
                                                             $class->_call_extensions('after_start');
 
@@ -67,7 +105,7 @@ sub Parameter {
 
                                                             $class->_call_extensions('before_stop');
 
-                                                            $class->stop;
+                                                            $class->stop unless($SKIP->{"stop"} == 1);
 
                                                             $class->_call_extensions('after_stop');
 
@@ -81,7 +119,7 @@ sub Parameter {
 
                                                             $class->_call_extensions('before_restart');
 
-                                                            $class->restart;
+                                                            $class->restart unless($SKIP->{"restart"} == 1);
 
                                                             $class->_call_extensions('after_restart');
 
@@ -96,7 +134,7 @@ sub Parameter {
 
                                                             $class->_call_extensions('before_reload');
 
-                                                            $class->reload;
+                                                            $class->reload unless($SKIP->{"reload"} == 1);
 
                                                             $class->_call_extensions('after_reload');
 
@@ -111,13 +149,15 @@ sub Parameter {
 
                                                             $class->_call_extensions('before_status');
 
-                                                            my $ret = $class->status;
-                                                            if($ret) {
-                                                               ServerControl->d_print("Running\n");
-                                                               exit 0;
-                                                            } else {
-                                                               ServerControl->d_print("Stopped\n");
-                                                               exit 1;
+                                                            if($SKIP->{"status"} == 0) {
+                                                               my $ret = $class->status;
+                                                               if($ret) {
+                                                                  ServerControl->d_print("Running\n");
+                                                                  exit 0;
+                                                               } else {
+                                                                  ServerControl->d_print("Stopped\n");
+                                                                  exit 1;
+                                                               }
                                                             }
 
                                                             $class->_call_extensions('after_status');
