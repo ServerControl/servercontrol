@@ -20,12 +20,8 @@ use ServerControl::Commons::Object;
 use ServerControl::Exception::SyntaxError;
 use ServerControl::Exception::Unknown;
 
-require Exporter;
-
-use vars qw($SKIP @EXPORT);
-@EXPORT = qw(skip_start skip_stop skip_status skip_restart);
-
-use base qw(ServerControl::Commons::Object Exporter);
+use vars qw($SKIP);
+use base qw(ServerControl::Commons::Object);
 
 
 $SKIP = {
