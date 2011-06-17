@@ -342,13 +342,17 @@ sub create_files {
    for my $file (keys %{$files}) {
       my $c = $files->{$file};
 
-      if(exists $c->{'call'}) {
-         my $code = $c->{'call'};
-         &$code($path . '/' . $file);
-      } elsif(exists $c->{'link'}) {
-         symlink($c->{'link'}, $path . '/' . $file);
-      } elsif(exists $c->{'copy'}) {
-         copy($c->{'copy'}, $path . '/' . $file);
+      if(exists $c->{"call"}) {
+         my $code = $c->{"call"};
+         &$code($path . "/" . $file);
+      } elsif(exists $c->{"link"}) {
+         symlink($c->{"link"}, $path . "/" . $file);
+      } elsif(exists $c->{"copy"}) {
+         copy($c->{"copy"}, $path . "/" . $file);
+      }
+
+      if(exists $c->{"chmod"}) {
+         chmod( oct($c->{"chmod"}), "$path/$file" );
       }
    }
 }
