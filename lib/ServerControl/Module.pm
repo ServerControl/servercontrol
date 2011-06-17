@@ -539,7 +539,11 @@ sub _read_fs_layout_files {
                call => $class->_parse_fslayout_option($filedef->{"call"}),
             };
          }
- 
+
+         if(exists $filedef->{"chmod"}) {
+            $return->{$class->_parse_fslayout_option($filedef->{"name"})}->{"chmod"} = 
+                                                $class->_parse_fslayout_option($filedef->{"chmod"});
+         }
       }
    }
 
