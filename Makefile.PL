@@ -6,6 +6,7 @@ WriteMakefile(
    NAME => 'ServerControl',
    VERSION_FROM => 'lib/ServerControl.pm',
    EXE_FILES => ['bin/servercontrol','bin/sc_create_initfile'],
+   PREREQ_PM => {'YAML' => 0},
    LICENSE => 'bsd'
 );
 
