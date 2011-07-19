@@ -40,8 +40,10 @@ sub run {
       $class->ctrl($exec_path);
    }
  
-   # lade schema
-   ServerControl::Schema->load_schema_module;
+   # try to load schema
+   eval {
+      ServerControl::Schema->load_schema_module;
+   };
 
    GetOptions(ServerControl::Module::Base->get_options);
   

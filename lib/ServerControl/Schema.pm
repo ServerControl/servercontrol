@@ -33,7 +33,7 @@ sub load_schema_module {
 
    unless($schema && $module) {
       ServerControl->d_print("no schema or module given.\n");
-      exit 1;
+      die("no schema or module given.");
    }
 
    my $class_name = "ServerControl::Schema::${schema}::$module";
