@@ -19,9 +19,17 @@ sub stop {
    my ($class) = @_;
 
    my $pid_dir     = ServerControl::FsLayout->get_directory("Runtime", "pid");
-
    my ($name, $path) = ($class->get_name, $class->get_path);
    my $pid_file = "$path/$pid_dir/$name.pid";
+
+   if(!$pid_dir) {
+      $pid_file = ServerControl::FsLayout->get_file("Runtime", "pid");
+   }
+
+   if(!$pid_file) {
+      die("No PID file given / found");
+   }
+
    my $pid = eval { local(@ARGV, $/) = ($pid_file); <>; };
    chomp $pid;
 
@@ -33,9 +41,17 @@ sub status {
    my ($class) = @_;
 
    my $pid_dir     = ServerControl::FsLayout->get_directory("Runtime", "pid");
-
    my ($name, $path) = ($class->get_name, $class->get_path);
    my $pid_file = "$path/$pid_dir/$name.pid";
+
+   if(!$pid_dir) {
+      $pid_file = ServerControl::FsLayout->get_file("Runtime", "pid");
+   }
+
+   if(!$pid_file) {
+      die("No PID file given / found");
+   }
+
    if(-f $pid_file) { return 1; }
 }
 
