@@ -21,7 +21,7 @@ use Getopt::Long qw(:config pass_through);
 use File::Basename qw(dirname);
 use FindBin;
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 our $MODULES = [];
 
 $::debug = 0;

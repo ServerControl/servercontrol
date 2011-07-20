@@ -22,11 +22,11 @@ sub stop {
    my ($name, $path) = ($class->get_name, $class->get_path);
    my $pid_file = "$path/$pid_dir/$name.pid";
 
-   if(!$pid_dir) {
+   if(! -f $pid_file) {
       $pid_file = ServerControl::FsLayout->get_file("Runtime", "pid");
    }
 
-   if(!$pid_file) {
+   if(! -f $pid_file) {
       die("No PID file given / found");
    }
 
