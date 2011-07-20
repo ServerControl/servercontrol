@@ -1,3 +1,8 @@
+servercontrol (0.97) unstable; urgency=low
+  * added pid file
+
+ -- Jan Gehring <jan.gehring@gmail.com>  Thu, 14 Jul 2011 18:00:00 +0200
+
 servercontrol (0.96) unstable; urgency=low
   * added dependency to YAML
 
