@@ -21,7 +21,7 @@ use Getopt::Long qw(:config pass_through);
 use File::Basename qw(dirname);
 use FindBin;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 our $MODULES = [];
 
 $::debug = 0;
@@ -59,7 +59,13 @@ sub run {
    };
 
    MODULE: {
-      local $SIG{'__WARN__'} = sub { die(ServerControl::Exception::Unknown->new(message => $_[0])); };
+      local $SIG{'__WARN__'} = sub {
+         require Devel::StackTrace;
+         my $trace = Devel::StackTrace->new;
+         print $trace->as_string;
+
+         die(ServerControl::Exception::Unknown->new(message => $_[0]));
+      };
       GetOptions($mod_class->get_options);
    }
 
