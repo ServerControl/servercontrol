@@ -9,7 +9,7 @@ package ServerControl;
 use strict;
 use warnings;
 
-use ServerControl::Args;
+require ServerControl::Args;
 use ServerControl::FsLayout;
 use ServerControl::Template;
 use ServerControl::Commons::FS;
@@ -39,6 +39,9 @@ sub run {
       # um die instanz zu verwalten.
       $class->ctrl($exec_path);
    }
+   else {
+      ServerControl::Args->import;
+   }
  
    # try to load schema
    eval {
@@ -62,7 +65,7 @@ sub run {
       local $SIG{'__WARN__'} = sub {
          require Devel::StackTrace;
          my $trace = Devel::StackTrace->new;
-         print $trace->as_string;
+         ServerControl->d_print($trace->as_string);
 
          die(ServerControl::Exception::Unknown->new(message => $_[0]));
       };

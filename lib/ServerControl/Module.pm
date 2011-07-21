@@ -93,6 +93,20 @@ sub Parameter {
                                                             chdir($wd);
 
                                                         } };
+
+      $params->{'run-hook'} = { isa => 'string', call => sub {
+
+                                                            ServerControl->d_print("Calling hook " . ServerControl::Args->get->{'run-hook'} . "\n");
+
+                                                            my $wd = getcwd;
+                                                            chdir(ServerControl::Args->get->{'path'});
+
+                                                            $class->_call_extensions(ServerControl::Args->get->{'run-hook'});
+
+                                                            chdir($wd);
+
+                                                        } };
+
       $params->{'stop'} = { isa => 'bool', call => sub {
                                                             ServerControl->d_print("Stopping instance\n");
 
@@ -371,6 +385,8 @@ sub create_control_scripts {
       symlink($bin, "$path/control");
       return;
    }
+
+   symlink($bin, "$path/control");
 
    if($class->has('start')) {
       symlink($bin, "$path/start");

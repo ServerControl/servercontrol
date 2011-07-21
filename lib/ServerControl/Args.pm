@@ -8,6 +8,7 @@ package ServerControl::Args;
 
 use strict;
 use warnings;
+use Data::Dumper;
 
 use vars qw($ARGS);
 
