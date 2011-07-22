@@ -1,8 +1,13 @@
 servercontrol (0.99) unstable; urgency=low
+  * fixed help output
+  * allow nested extensions
+
+ -- Jan Gehring <jan.gehring@gmail.com>  Fri, 22 Jul 2011 10:30:00 +0200
+
+servercontrol (0.99) unstable; urgency=low
   * added StackTrace on die
 
  -- Jan Gehring <jan.gehring@gmail.com>  Thu, 14 Jul 2011 18:00:00 +0200
-
 
 servercontrol (0.98) unstable; urgency=low
   * added pid file
