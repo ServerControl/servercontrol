@@ -98,6 +98,7 @@ sub load_extension {
 
    my $ext_class = "ServerControl::Extension::$ext";
    my $ext_class_file = "ServerControl/Extension/$ext.pm";
+   $ext_class_file =~ s/::/\//g;
 
    ServerControl->d_print("ext_class: $ext_class\n");
    ServerControl->d_print("ext_class_file: $ext_class_file\n");
