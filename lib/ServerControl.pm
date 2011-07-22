@@ -51,7 +51,10 @@ sub run {
    GetOptions(ServerControl::Module::Base->get_options);
   
    my $mod       = ServerControl::Args->get->{'module'};
-   my $mod_class = ServerControl::Module->load_module($mod);
+   my $mod_class;
+   if($mod) {
+      $mod_class = ServerControl::Module->load_module($mod);
+   }
 
    @ARGV = (@ARGV, @ORIG_ARGV);
 
@@ -69,7 +72,9 @@ sub run {
 
          die(ServerControl::Exception::Unknown->new(message => $_[0]));
       };
-      GetOptions($mod_class->get_options);
+      if($mod_class) {
+         GetOptions($mod_class->get_options);
+      }
    }
 
 }
