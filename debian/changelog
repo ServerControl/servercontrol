@@ -1,4 +1,4 @@
-servercontrol (0.99) unstable; urgency=low
+servercontrol (0.100) unstable; urgency=low
   * fixed help output
   * allow nested extensions
 
