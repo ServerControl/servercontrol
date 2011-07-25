@@ -8,5 +8,5 @@ Homepage: https://github.com/servercontrol
 
 Package: servercontrol
 Architecture: all
-Depends: perl (>= 5.10.0), libyaml-perl
+Depends: perl (>= 5.10.0), libyaml-perl, libdevel-stacktrace-perl
 Description: ServerControl
