@@ -1,3 +1,8 @@
+servercontrol (0.102) unstable; urgency=low
+  * Fix: copy in YAML file not copy file to destination
+
+ -- Daniel Bäurer <daniel.baeurer@web.de>  Thu, 13 October 2011 13:32:00 +0200
+
 servercontrol (0.101) unstable; urgency=low
   * fixed dependency to Devel::StackTrace
 
