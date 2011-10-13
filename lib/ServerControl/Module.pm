@@ -550,6 +550,11 @@ sub _read_fs_layout_files {
                link => $class->_parse_fslayout_option($filedef->{"link"}),
             };
          }
+         elsif(exists $filedef->{"copy"}) {
+            $return->{$class->_parse_fslayout_option($filedef->{"name"})} = {
+               copy => $class->_parse_fslayout_option($filedef->{"copy"}),
+            };
+         }
          elsif(exists $filedef->{"call"}) {
             $return->{$class->_parse_fslayout_option($filedef->{"name"})} = {
                call => $class->_parse_fslayout_option($filedef->{"call"}),
