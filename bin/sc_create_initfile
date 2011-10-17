@@ -150,7 +150,7 @@ do_start()
 	
 	${INSTANCEPATH}/start 		
 	RETVAL="$?"
-	return "$RETVAL"
+	exit "$RETVAL"
 }
 
 #
@@ -166,7 +166,7 @@ do_stop()
 	
 	${INSTANCEPATH}/stop 		
 	RETVAL="$?"
-	return "$RETVAL"
+	exit "$RETVAL"
 }
 
 case "$1" in
