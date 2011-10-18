@@ -1,4 +1,5 @@
 bin/servercontrol
+bin/sc_create_initfile
 lib/ServerControl.pm
 lib/ServerControl/Args.pm
 lib/ServerControl/Commons/FS.pm
