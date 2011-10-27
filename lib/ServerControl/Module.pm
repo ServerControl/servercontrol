@@ -365,6 +365,10 @@ sub create_files {
          copy($c->{"copy"}, $path . "/" . $file);
       }
 
+      if(exists $c->{"user"} && $c->{"group"}) {
+         simple_chown($c->{"user"}, $c->{"group"}, "$path/$file");
+      }
+
       if(exists $c->{"chmod"}) {
          chmod( oct($c->{"chmod"}), "$path/$file" );
       }
@@ -564,6 +568,16 @@ sub _read_fs_layout_files {
          if(exists $filedef->{"chmod"}) {
             $return->{$class->_parse_fslayout_option($filedef->{"name"})}->{"chmod"} = 
                                                 $class->_parse_fslayout_option($filedef->{"chmod"});
+         }
+
+         if(exists $filedef->{"user"}) {
+            $return->{$class->_parse_fslayout_option($filedef->{"name"})}->{"user"} =
+                                                $class->_parse_fslayout_option($filedef->{"user"});
+         }
+
+         if(exists $filedef->{"group"}) {
+            $return->{$class->_parse_fslayout_option($filedef->{"name"})}->{"group"} =
+                                                $class->_parse_fslayout_option($filedef->{"group"});
          }
       }
    }
