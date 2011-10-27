@@ -1,3 +1,9 @@
+servercontrol (0.105) unstable; urgency=low
+
+  * Create files from yaml with user:group
+
+ -- Daniel Bäurer <daniel.baeurer@web.de>  Wed, 18 October 2011 12:52:00 +0200
+
 servercontrol (0.104) unstable; urgency=low
 
   * Wrong build package
