@@ -22,7 +22,13 @@ sub set {
 
 sub import {
    foreach my $o (@ARGV) {
-      my($key, $val) = ($o =~ m/^--(.*?)=(.*)$/);
+
+      # damit man auch ./control start eingeben kann...
+      unless($o =~ m/^--/) {
+         $o = "--$o";
+      }
+
+      my($key, $val) = ($o =~ m/^--([a-zA-Z0-9_\-\.\/]+)=(.*)$/);
       if(!$key && !$val) {
          $o =~ m/^--(.*?)$/;
          $key = $1;
