@@ -75,6 +75,8 @@ sub Parameter {
                                                                $class->create_instance_conf;
 
                                                                $class->_call_extensions('after_create');
+
+                                                               ServerControl->say("Instance created.");
                                                            } };
 
       $params->{'start'} = { isa => 'bool', call => sub {
@@ -91,6 +93,8 @@ sub Parameter {
                                                             $class->_call_extensions('after_start');
 
                                                             chdir($wd);
+
+                                                            ServerControl->say("Instance started.");
 
                                                         } };
 
@@ -120,6 +124,8 @@ sub Parameter {
                                                             $class->_call_extensions('after_stop');
 
                                                             chdir($wd);
+
+                                                            ServerControl->say("Instance stopped.");
                                                         } };
       $params->{'restart'} = { isa => 'bool', call => sub {
                                                             ServerControl->d_print("Restarting instance\n");
@@ -134,6 +140,8 @@ sub Parameter {
                                                             $class->_call_extensions('after_restart');
 
                                                             chdir($wd);
+
+                                                            ServerControl->say("Instance restarted.");
                                                         } };
 
       $params->{'reload'} = { isa => 'bool', call => sub {
@@ -149,6 +157,8 @@ sub Parameter {
                                                             $class->_call_extensions('after_reload');
 
                                                             chdir($wd);
+
+                                                            ServerControl->say("Instance reloaded.");
                                                         } };
 
       $params->{'status'} = { isa => 'bool', call => sub {
@@ -162,10 +172,10 @@ sub Parameter {
                                                             if($SKIP->{"status"} == 0) {
                                                                my $ret = $class->status;
                                                                if($ret) {
-                                                                  ServerControl->d_print("Running\n");
+                                                                  ServerControl->say("Instance running.");
                                                                   exit 0;
                                                                } else {
-                                                                  ServerControl->d_print("Stopped\n");
+                                                                  ServerControl->say("Instance stopped.");
                                                                   exit 1;
                                                                }
                                                             }
@@ -186,6 +196,8 @@ sub Parameter {
                                                                }
 
                                                                $class->_call_extensions('after_recreate');
+
+                                                               ServerControl->say("Instance recreated.");
                                                            } };
 
 

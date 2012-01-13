@@ -21,7 +21,7 @@ use Getopt::Long qw(:config pass_through);
 use File::Basename qw(dirname);
 use FindBin;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 our $MODULES = [];
 
 $::debug = 0;
@@ -127,6 +127,12 @@ sub d_print {
    if($::debug) {
       print STDERR "[DEBUG] $msg";
    }
+}
+
+sub say {
+   my ($class, $msg) = @_;
+
+   print STDOUT $msg . "\n";
 }
 
 1;

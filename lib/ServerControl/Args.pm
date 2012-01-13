@@ -29,7 +29,7 @@ sub import {
       }
 
       my($key, $val) = ($o =~ m/^--([a-zA-Z0-9_\-\.\/]+)=(.*)$/);
-      if(!$key && !$val) {
+      if(!$key && ! defined $val) {
          $o =~ m/^--(.*?)$/;
          $key = $1;
          $val = 1;

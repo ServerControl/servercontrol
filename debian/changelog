@@ -1,3 +1,10 @@
+servercontrol (0.106) unstable; urgency=low
+
+  * Added some output.
+  * allow parameters without leading "--"
+
+ -- Jan Gehring <jan.gehring@gmail.com>  Fri, 13 Jan 2012 13:30:00 +0200
+
 servercontrol (0.105) unstable; urgency=low
 
   * Create files from yaml with user:group
